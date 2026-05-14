@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { fmtDate } from '@/lib/utils'
+import { fmtDate, computeSyhEstado } from '@/lib/utils'
 
 export default async function ClientesPage() {
   const supabase = createClient()
@@ -75,9 +75,11 @@ export default async function ClientesPage() {
                   </td>
                   <td><span className="badge badge-blue">—</span></td>
                   <td>
-                    <span className={`badge ${c.estado_syh === 'ok' ? 'badge-ok' : c.estado_syh === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
-                      {c.estado_syh === 'ok' ? 'Vigente' : c.estado_syh === 'warn' ? 'Por vencer' : 'Vencido'}
-                    </span>
+                    {(() => { const s = computeSyhEstado(c.vence_syh, c.estado_syh); return (
+                      <span className={`badge ${s === 'ok' ? 'badge-ok' : s === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
+                        {s === 'ok' ? 'Vigente' : s === 'warn' ? 'Por vencer' : 'Vencido'}
+                      </span>
+                    )})()}
                   </td>
                   <td><span className="text-xs text-slate-500">{c.iso_estado}</span></td>
                   <td><span className="text-xs text-slate-400">{fmtDate(c.created_at)}</span></td>

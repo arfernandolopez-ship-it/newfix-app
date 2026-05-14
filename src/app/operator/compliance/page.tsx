@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { fmtDate, daysUntil } from '@/lib/utils'
+import { fmtDate, daysUntil, computeSyhEstado } from '@/lib/utils'
 import Link from 'next/link'
 
 export default async function CompliancePage() {
@@ -30,8 +30,9 @@ export default async function CompliancePage() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           {(clientes || []).map((c: any) => {
             const days = daysUntil(c.vence_syh)
-            const isRisk = c.estado_syh === 'risk'
-            const isWarn = c.estado_syh === 'warn'
+            const computedEstado = computeSyhEstado(c.vence_syh, c.estado_syh)
+            const isRisk = computedEstado === 'risk'
+            const isWarn = computedEstado === 'warn'
             const borderColor = isRisk ? '#DC2626' : isWarn ? '#D97706' : '#059669'
             const badgeClass = isRisk ? 'badge-risk' : isWarn ? 'badge-warn' : 'badge-ok'
             return (

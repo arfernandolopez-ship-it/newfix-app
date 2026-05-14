@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { fmt, fmtDate, daysUntil } from '@/lib/utils'
+import { fmt, fmtDate, daysUntil, computeSyhEstado } from '@/lib/utils'
 import { ETAPAS } from '@/types'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -24,8 +24,9 @@ export default async function ClienteDetailPage({ params }: { params: { id: stri
   const COLORS: Record<string, string> = { 'G': '#2563EB', 'P': '#7C3AED', 'T': '#059669', 'F': '#DC2626' }
   const avatarBg = COLORS[cliente.nombre[0]] || '#64748B'
 
-  const syhClass = cliente.estado_syh === 'ok' ? 'badge-ok' : cliente.estado_syh === 'warn' ? 'badge-warn' : 'badge-risk'
-  const syhLabel = cliente.estado_syh === 'ok' ? 'SyH Vigente' : cliente.estado_syh === 'warn' ? 'SyH por vencer' : 'SyH vencido'
+  const syhEstado = computeSyhEstado(cliente.vence_syh, cliente.estado_syh)
+  const syhClass = syhEstado === 'ok' ? 'badge-ok' : syhEstado === 'warn' ? 'badge-warn' : 'badge-risk'
+  const syhLabel = syhEstado === 'ok' ? 'SyH Vigente' : syhEstado === 'warn' ? 'SyH por vencer' : 'SyH vencido'
 
   return (
     <div className="flex flex-col h-full">

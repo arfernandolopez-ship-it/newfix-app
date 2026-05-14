@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { fmt, fmtDate, daysUntil } from '@/lib/utils'
+import { fmt, fmtDate, daysUntil, computeSyhEstado } from '@/lib/utils'
 import { AlertTriangle, Users, Wrench, DollarSign, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { Cliente, Tarea, Factura, Compliance } from '@/types'
@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   ])
 
   const totalPorCobrar = (facturas || []).reduce((s: number, f: any) => s + f.monto, 0)
-  const alertasSyh = (clientes || []).filter((c: any) => c.estado_syh !== 'ok')
+  const alertasSyh = (clientes || []).filter((c: any) => computeSyhEstado(c.vence_syh, c.estado_syh) !== 'ok')
   const tareasUrgentes = (tareas || []).filter((t: any) => t.prioridad === 'alta')
   const trabajosActivos = (trabajos || []).length
 
@@ -96,22 +96,25 @@ export default async function DashboardPage() {
               {alertasSyh.length === 0 && (
                 <div className="card p-4 text-sm text-slate-400 text-center">Sin alertas activas ✓</div>
               )}
-              {alertasSyh.map((c: any) => (
-                <Link key={c.id} href={`/operator/clientes/${c.id}`}>
-                  <div className={`flex items-center gap-3 bg-white border rounded-xl p-3 cursor-pointer hover:bg-slate-50 transition-colors border-l-4 ${c.estado_syh === 'risk' ? 'border-l-red-500' : 'border-l-amber-400'}`}>
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${c.estado_syh === 'risk' ? 'bg-red-500' : 'bg-amber-400'}`} />
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold text-slate-900">{c.nombre}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        {c.estado_syh === 'risk' ? 'SyH o ART vencida — gestionar urgente' : `SyH vence ${fmtDate(c.vence_syh)}`}
+              {alertasSyh.map((c: any) => {
+                const syh = computeSyhEstado(c.vence_syh, c.estado_syh)
+                return (
+                  <Link key={c.id} href={`/operator/clientes/${c.id}`}>
+                    <div className={`flex items-center gap-3 bg-white border rounded-xl p-3 cursor-pointer hover:bg-slate-50 transition-colors border-l-4 ${syh === 'risk' ? 'border-l-red-500' : 'border-l-amber-400'}`}>
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${syh === 'risk' ? 'bg-red-500' : 'bg-amber-400'}`} />
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold text-slate-900">{c.nombre}</div>
+                        <div className="text-xs text-slate-400 mt-0.5">
+                          {syh === 'risk' ? 'SyH vencida — gestionar urgente' : `SyH vence ${fmtDate(c.vence_syh)}`}
+                        </div>
                       </div>
+                      <span className={`text-xs font-bold ${syh === 'risk' ? 'text-red-600' : 'text-amber-600'}`}>
+                        {syh === 'risk' ? 'URGENTE' : `${daysUntil(c.vence_syh)} días`}
+                      </span>
                     </div>
-                    <span className={`text-xs font-bold ${c.estado_syh === 'risk' ? 'text-red-600' : 'text-amber-600'}`}>
-                      {c.estado_syh === 'risk' ? 'URGENTE' : `${daysUntil(c.vence_syh)} días`}
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                )
+              })}
             </div>
 
             {/* Clientes recientes */}
@@ -145,9 +148,11 @@ export default async function DashboardPage() {
                         </Link>
                       </td>
                       <td><span className={`badge badge-${c.plan} px-2 py-0.5 rounded-full`}>{c.plan.charAt(0).toUpperCase() + c.plan.slice(1)}</span></td>
-                      <td><span className={`badge ${c.estado_syh === 'ok' ? 'badge-ok' : c.estado_syh === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
-                        {c.estado_syh === 'ok' ? 'OK' : c.estado_syh === 'warn' ? 'Por vencer' : 'Vencido'}
-                      </span></td>
+                      <td>{(() => { const s = computeSyhEstado(c.vence_syh, c.estado_syh); return (
+                        <span className={`badge ${s === 'ok' ? 'badge-ok' : s === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
+                          {s === 'ok' ? 'OK' : s === 'warn' ? 'Por vencer' : 'Vencido'}
+                        </span>
+                      )})()}</td>
                       <td><span className="font-mono text-xs text-slate-600">—</span></td>
                     </tr>
                   ))}
@@ -186,9 +191,11 @@ export default async function DashboardPage() {
                       {c.nombre.slice(0, 2).toUpperCase()}
                     </div>
                     <span className="text-xs font-semibold text-slate-700 flex-1 truncate">{c.nombre.split(' ')[0]}</span>
-                    <span className={`badge ${c.estado_syh === 'ok' ? 'badge-ok' : c.estado_syh === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
-                      {c.estado_syh === 'ok' ? 'OK' : c.estado_syh === 'warn' ? 'Próximo' : 'Vencido'}
-                    </span>
+                    {(() => { const s = computeSyhEstado(c.vence_syh, c.estado_syh); return (
+                      <span className={`badge ${s === 'ok' ? 'badge-ok' : s === 'warn' ? 'badge-warn' : 'badge-risk'}`}>
+                        {s === 'ok' ? 'OK' : s === 'warn' ? 'Próximo' : 'Vencido'}
+                      </span>
+                    )})()}
                   </div>
                 ))}
               </div>
