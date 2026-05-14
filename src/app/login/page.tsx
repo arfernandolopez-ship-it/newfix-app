@@ -25,7 +25,8 @@ export default function LoginPage() {
       .from('client_users')
       .select('role')
       .eq('user_id', data.user.id)
-      .single()
+      .limit(1)
+      .maybeSingle()
 
     if (cu?.role === 'operator') window.location.replace('/operator/dashboard')
     else window.location.replace('/client/inicio')

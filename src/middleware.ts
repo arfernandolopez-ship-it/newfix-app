@@ -32,7 +32,8 @@ export async function middleware(request: NextRequest) {
         .from('client_users')
         .select('role')
         .eq('user_id', user.id)
-        .single()
+        .limit(1)
+        .maybeSingle()
 
       if (clientUser?.role === 'operator') {
         return NextResponse.redirect(new URL('/operator/dashboard', request.url))
@@ -54,7 +55,8 @@ export async function middleware(request: NextRequest) {
       .from('client_users')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .limit(1)
+      .maybeSingle()
 
     if (clientUser?.role !== 'operator') {
       return NextResponse.redirect(new URL('/client/inicio', request.url))
@@ -67,7 +69,8 @@ export async function middleware(request: NextRequest) {
       .from('client_users')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .limit(1)
+      .maybeSingle()
 
     if (!clientUser) {
       return NextResponse.redirect(new URL('/login', request.url))
