@@ -11,7 +11,7 @@ export default async function CompliancePage() {
     .order('estado_syh')
 
   const { data: compliance } = await supabase
-    .from('compliance')
+    .from('cumplimiento')
     .select('*, cliente:clientes(nombre)')
     .order('fecha_vencimiento')
 

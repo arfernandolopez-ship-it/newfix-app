@@ -9,7 +9,7 @@ export default async function ClientInicioPage() {
 
   // Get client profile
   const { data: clientUser } = await supabase
-    .from('client_users')
+    .from('usuarios_clientes')
     .select('*, cliente:clientes(*)')
     .eq('user_id', user?.id)
     .single()

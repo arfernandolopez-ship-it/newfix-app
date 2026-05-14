@@ -6,7 +6,7 @@ export default async function ClientAgendaPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const { data: clientUser } = await supabase
-    .from('client_users').select('cliente_id').eq('user_id', user?.id).single()
+    .from('usuarios_clientes').select('cliente_id').eq('user_id', user?.id).single()
 
   const { data: trabajos } = await supabase
     .from('trabajos').select('*').eq('cliente_id', clientUser?.cliente_id)

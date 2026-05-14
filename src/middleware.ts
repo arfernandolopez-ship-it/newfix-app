@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     if (user) {
       // Si ya está logueado, redirigir según rol
       const { data: clientUser } = await supabase
-        .from('client_users')
+        .from('usuarios_clientes')
         .select('role')
         .eq('user_id', user.id)
         .single()
@@ -51,7 +51,7 @@ export async function middleware(request: NextRequest) {
   // Verificar rol para rutas de operador
   if (path.startsWith('/operator')) {
     const { data: clientUser } = await supabase
-      .from('client_users')
+      .from('usuarios_clientes')
       .select('role')
       .eq('user_id', user.id)
       .single()
@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
   // Verificar rol para rutas de cliente
   if (path.startsWith('/client')) {
     const { data: clientUser } = await supabase
-      .from('client_users')
+      .from('usuarios_clientes')
       .select('role')
       .eq('user_id', user.id)
       .single()

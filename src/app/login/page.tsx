@@ -22,7 +22,7 @@ export default function LoginPage() {
 
     // Determinar rol y redirigir con full page reload para que el middleware lea la sesión
     const { data: cu } = await supabase
-      .from('client_users')
+      .from('usuarios_clientes')
       .select('role')
       .eq('user_id', data.user.id)
       .single()
