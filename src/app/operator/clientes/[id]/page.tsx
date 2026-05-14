@@ -16,7 +16,7 @@ export default async function ClienteDetailPage({ params }: { params: { id: stri
     supabase.from('clientes').select('*').eq('id', params.id).single(),
     supabase.from('trabajos').select('*').eq('cliente_id', params.id).order('created_at', { ascending: false }),
     supabase.from('facturas').select('*').eq('cliente_id', params.id).order('fecha_emision', { ascending: false }),
-    supabase.from('cumplimiento').select('*').eq('cliente_id', params.id),
+    supabase.from('compliance').select('*').eq('cliente_id', params.id),
   ])
 
   if (!cliente) notFound()

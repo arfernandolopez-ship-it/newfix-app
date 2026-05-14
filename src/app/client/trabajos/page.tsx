@@ -17,7 +17,7 @@ export default async function ClientTrabajosPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: clientUser } = await supabase
-    .from('usuarios_clientes')
+    .from('client_users')
     .select('cliente_id')
     .eq('user_id', user?.id)
     .single()

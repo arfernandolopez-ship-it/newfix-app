@@ -18,7 +18,7 @@ export default async function DashboardPage() {
     supabase.from('tareas').select('*, cliente:clientes(nombre)').eq('completada', false).order('fecha_limite'),
     supabase.from('facturas').select('*, cliente:clientes(nombre)').neq('estado', 'cobrada').order('created_at', { ascending: false }),
     supabase.from('trabajos').select('*, cliente:clientes(nombre)').eq('estado', 'activo'),
-    supabase.from('cumplimiento').select('*, cliente:clientes(nombre)').neq('estado', 'renovado'),
+    supabase.from('compliance').select('*, cliente:clientes(nombre)').neq('estado', 'renovado'),
   ])
 
   const totalPorCobrar = (facturas || []).reduce((s: number, f: any) => s + f.monto, 0)

@@ -6,7 +6,7 @@ export default async function ClientCobrosPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: clientUser } = await supabase
-    .from('usuarios_clientes').select('cliente_id').eq('user_id', user?.id).single()
+    .from('client_users').select('cliente_id').eq('user_id', user?.id).single()
 
   const { data: facturas } = await supabase
     .from('facturas').select('*').eq('cliente_id', clientUser?.cliente_id)
